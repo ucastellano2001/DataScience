@@ -1,0 +1,99 @@
+---
+title: "PEC2_DATAVIS"
+author: "Oriol Castellano Aguilera"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+library(ggalluvial)
+library(ggVennDiagram)
+library(tidyverse)
+library(geofacet)
+```
+
+```{r}
+text1 <- "Para bailar la bamba
+Para bailar la bamba
+Se necesita una poca de gracia
+Una poca de gracia y otra cosita
+Ahí arriba, ahí arriba
+Yo no soy marinero
+Soy capitán, soy capitán, soy capitán
+"
+text2 <- "Dale a tu cuerpo alegría, Macarena
+Que tu cuerpo es pa' darle alegría y cosa buena
+Dale a tu cuerpo alegría, Macarena
+Eh, Macarena
+Que te gustan los veranos de Marbella
+Y a ti te gusta la movida guerrillera
+Dale a tu cuerpo alegría, Macarena
+Eh, Macarena
+Que te gusta la movida guerrillera
+"
+
+words1 <- unique(unlist(strsplit(tolower(text1), "\\s+")))
+words2 <- unique(unlist(strsplit(tolower(text2), "\\s+")))
+
+venn_list <- list(
+  `A` = words1,
+  `B` = words2
+)
+
+ggVennDiagram(venn_list) +
+  scale_fill_gradient(low = "white", high = "darkred") +
+  theme_minimal() +
+  labs(
+    title = "Comparación de Palabras Comunes entre Textos",
+    subtitle = "Número de palabras comunes y únicas entre los dos textos",
+    fill = "Número de palabras",
+       y = NULL,  
+       x = NULL) +  
+  theme(
+    legend.position = "right", 
+    plot.title = element_text(hjust = 0.5),  # Centrar el título
+    plot.subtitle = element_text(hjust = 0.5)  # Centrar el subtítulo
+  ) 
+```
+
+
+
+```{r}
+titanic <- as.data.frame(Titanic)
+
+ggplot(titanic, aes(y = Freq, axis1 = Class, axis2 = Sex, axis3 = Survived)) +
+  geom_alluvium(aes(fill = Class), width = 0.25, alpha = 0.7, show.legend = FALSE) +
+  geom_stratum(width = 0.2, fill = "white") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_continuous(breaks = 1:3, labels = c("Clase", "Sexo", "Supervivencia")) +
+  theme_minimal() +
+  theme(
+    legend.position = "none", 
+    axis.text.y = element_blank(),  
+    axis.ticks.y = element_blank(),  
+    panel.grid.major.y = element_blank(),  
+    panel.grid.minor.y = element_blank()  
+  ) +
+  labs(title = "Análisis de Supervivencia en el Titanic",
+       y = NULL,
+       x = "Factores influyentes")
+```
+
+
+```{r}
+df <- USArrests
+df$state <- state.abb 
+
+ggplot(df, aes(x = 1, y = 1, fill = Murder)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "lightblue", high = "red") +
+  theme_minimal() +
+  facet_geo(~ state, grid = "us_state_grid1") + 
+  labs(title = "Número de asesinatos por estado en EE.UU.",
+       fill = "Asesinatos",
+       y = NULL,
+       x = NULL) +
+  theme(axis.text = element_blank(),  
+        axis.ticks = element_blank())
+```
+
